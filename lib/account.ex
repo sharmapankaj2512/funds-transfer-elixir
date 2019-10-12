@@ -1,8 +1,8 @@
 defmodule FundsTransfer.Account do
-  use Agent
+  use GenServer
 
   def start_link() do
-    Agent.start_link(fn -> 0 end)
+    GenServer.start_link(__MODULE__, 0)
   end
 
   def open() do
@@ -11,14 +11,34 @@ defmodule FundsTransfer.Account do
   end
 
   def balance(accountId) do
-    Agent.get(accountId, & &1)
+    GenServer.call(accountId, :balance)
   end
 
   def credit(accountId, amount) do
-    Task.async(fn -> Agent.update(accountId, &(&1 + amount)) end)
+    Task.async(fn -> GenServer.call(accountId, {:credit, amount}) end)
   end
 
   def debit(accountId, amount) do
-    Task.async(fn -> Agent.update(accountId, &(&1 - amount)) end)
+    Task.async(fn -> GenServer.call(accountId, {:debit, amount}) end)
+  end
+
+  @impl true
+  def init(balance) do
+    {:ok, balance}
+  end
+
+  @impl true
+  def handle_call(:balance, _from, balance) do
+    {:reply, balance, balance}
+  end
+
+  @impl true
+  def handle_call({:credit, amount}, _from, balance) do
+    {:reply, balance + amount, balance + amount}
+  end
+
+  @impl true
+  def handle_call({:debit, amount}, _from, balance) do
+    {:reply, balance - amount, balance - amount}
   end
 end

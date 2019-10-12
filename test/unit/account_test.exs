@@ -11,17 +11,24 @@ defmodule AccountTest do
   end
 
   test "should credit amount to account" do
-    id = FundsTransfer.Account.open()
+    id = Account.open()
     Task.await(Account.credit(id, 100))
 
-    assert FundsTransfer.Account.balance(id) == 100
+    assert Account.balance(id) == 100
   end
 
   test "should debit amount from account" do
-    id = FundsTransfer.Account.open()
+    id = Account.open()
     Task.await(Account.credit(id, 100))
     Task.await(Account.debit(id, 100))
 
-    assert FundsTransfer.Account.balance(id) == 0
+    assert Account.balance(id) == 0
   end
+
+#   test "should return error on debit when balance is not sufficient" do
+#     id = Account.open()
+#     {:error, :message} = Task.await(Account.debit(id, 100))
+
+#     assert :message == "Insufficient balance"
+#   end
 end
