@@ -19,6 +19,13 @@ defmodule AccountTest do
 
       assert Account.balance(id) == 100
     end
+
+    test "should return error when amount is negative" do
+      id = Account.open()
+      {:error, message} = Task.await(Account.credit(id, -100))
+
+      assert message == "Negative amount"
+    end
   end
 
   describe "debit()" do
