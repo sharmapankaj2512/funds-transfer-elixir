@@ -48,6 +48,11 @@ defmodule FundsTransfer.Account do
   end
 
   @impl true
+  def handle_call({:debit, amount}, _from, balance) when amount < 0 do
+    {:reply, {:error, "Negative amount"}, balance}
+  end
+
+  @impl true
   def handle_call({:debit, amount}, _from, balance) when balance >= amount do
     {:reply, balance - amount, balance - amount}
   end
