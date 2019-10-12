@@ -25,10 +25,10 @@ defmodule AccountTest do
     assert Account.balance(id) == 0
   end
 
-#   test "should return error on debit when balance is not sufficient" do
-#     id = Account.open()
-#     {:error, :message} = Task.await(Account.debit(id, 100))
+  test "should return error on debit when balance is not sufficient" do
+    id = Account.open()
+    {:error, message} = Task.await(Account.debit(id, 100))
 
-#     assert :message == "Insufficient balance"
-#   end
+    assert message == "Insufficient balance"
+  end
 end

@@ -38,7 +38,12 @@ defmodule FundsTransfer.Account do
   end
 
   @impl true
-  def handle_call({:debit, amount}, _from, balance) do
+  def handle_call({:debit, amount}, _from, balance) when balance >= amount do
     {:reply, balance - amount, balance - amount}
+  end
+
+  @impl true
+  def handle_call({:debit, amount}, _from, balance) when amount > balance do
+    {:reply, {:error, "Insufficient balance"}, balance}
   end
 end
