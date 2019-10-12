@@ -22,9 +22,16 @@ defmodule FundsTransfer.Account do
     Task.async(fn -> GenServer.call(accountId, {:debit, amount}) end)
   end
 
+  def revert_debit(accountId, amount) do
+    Task.async(fn -> GenServer.call(accountId, {:revert_debit, amount}) end)
+  end
+
   def transfer(source, target, amount) do
-    debit(source, amount)
-    credit(target, amount)
+    task = debit(source, amount)
+    case Task.await(credit(target, amount)) do
+      {:error, _} -> revert_debit(source, amount)
+      _ -> task
+    end
   end
 
   @impl true
@@ -65,5 +72,10 @@ defmodule FundsTransfer.Account do
   @impl true
   def handle_call({:debit, amount}, _from, balance) when amount > balance do
     {:reply, {:error, "Insufficient balance"}, balance}
+  end
+
+  @impl true
+  def handle_call({:revert_debit, amount}, _from, balance) do
+    {:reply, balance + amount, balance + amount}
   end
 end

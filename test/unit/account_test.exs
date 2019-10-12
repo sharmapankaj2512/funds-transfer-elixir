@@ -70,5 +70,15 @@ defmodule AccountTest do
       assert assert Account.balance(source) == 0
       assert assert Account.balance(target) == 100
     end
+
+    test "should revert debit when credit fails" do
+      source = Account.open()
+      target = Account.open()
+
+      Task.await(Account.credit(source, 1000))
+      Task.await(Account.transfer(source, target, 1000))
+
+      assert Account.balance(source) == 1000
+    end
   end
 end
