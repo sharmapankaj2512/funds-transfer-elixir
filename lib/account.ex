@@ -22,9 +22,9 @@ defmodule FundsTransfer.Account do
     Task.async(fn -> GenServer.call(accountId, {:debit, amount}) end)
   end
 
-  def transfer(first, second, amount) do
-    debit(first, amount)
-    credit(second, amount)
+  def transfer(source, target, amount) do
+    debit(source, amount)
+    credit(target, amount)
   end
 
   @impl true

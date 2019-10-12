@@ -4,42 +4,50 @@ defmodule AccountTest do
 
   alias FundsTransfer.Account, as: Account
 
-  test "should create account with zero balance" do
-    id = Account.open()
+  describe "open()" do
+    test "should create account with zero balance" do
+      id = Account.open()
 
-    assert Account.balance(id) == 0
+      assert Account.balance(id) == 0
+    end
   end
 
-  test "should credit amount to account" do
-    id = Account.open()
-    Task.await(Account.credit(id, 100))
+  describe "credit()" do
+    test "should add amount to account" do
+      id = Account.open()
+      Task.await(Account.credit(id, 100))
 
-    assert Account.balance(id) == 100
+      assert Account.balance(id) == 100
+    end
   end
 
-  test "should debit amount from account" do
-    id = Account.open()
-    Task.await(Account.credit(id, 100))
-    Task.await(Account.debit(id, 100))
+  describe "debit()" do
+    test "should deduct amount from account" do
+      id = Account.open()
+      Task.await(Account.credit(id, 100))
+      Task.await(Account.debit(id, 100))
 
-    assert Account.balance(id) == 0
+      assert Account.balance(id) == 0
+    end
+
+    test "should return error when balance is not sufficient" do
+      id = Account.open()
+      {:error, message} = Task.await(Account.debit(id, 100))
+
+      assert message == "Insufficient balance"
+    end
   end
 
-  test "should return error on debit when balance is not sufficient" do
-    id = Account.open()
-    {:error, message} = Task.await(Account.debit(id, 100))
+  describe "transfer()" do
+    test "should deduct from source and add to target account" do
+      source = Account.open()
+      target = Account.open()
 
-    assert message == "Insufficient balance"
-  end
+      Task.await(Account.credit(source, 100))
+      Task.await(Account.transfer(source, target, 100))
 
-  test "should transfer from one account to other" do
-    first = Account.open()
-    second = Account.open()
-
-    Task.await(Account.credit(first, 100))
-    Task.await(Account.transfer(first, second, 100))
-
-    assert assert Account.balance(first) == 0
-    assert assert Account.balance(second) == 100
+      assert assert Account.balance(source) == 0
+      assert assert Account.balance(target) == 100
+    end
   end
 end
