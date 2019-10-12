@@ -22,6 +22,11 @@ defmodule FundsTransfer.Account do
     Task.async(fn -> GenServer.call(accountId, {:debit, amount}) end)
   end
 
+  def transfer(first, second, amount) do
+    debit(first, amount)
+    credit(second, amount)
+  end
+
   @impl true
   def init(balance) do
     {:ok, balance}

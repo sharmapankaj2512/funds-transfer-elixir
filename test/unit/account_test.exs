@@ -31,4 +31,15 @@ defmodule AccountTest do
 
     assert message == "Insufficient balance"
   end
+
+  test "should transfer from one account to other" do
+    first = Account.open()
+    second = Account.open()
+
+    Task.await(Account.credit(first, 100))
+    Task.await(Account.transfer(first, second, 100))
+
+    assert assert Account.balance(first) == 0
+    assert assert Account.balance(second) == 100
+  end
 end
