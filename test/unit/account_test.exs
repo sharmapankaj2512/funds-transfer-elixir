@@ -26,6 +26,13 @@ defmodule AccountTest do
 
       assert message == "Negative amount"
     end
+
+    test "should return error when amount is greater than 1000" do
+      id = Account.open()
+      {:error, message} = Task.await(Account.credit(id, 1000))
+
+      assert message == "Limit Exceeded"
+    end
   end
 
   describe "debit()" do

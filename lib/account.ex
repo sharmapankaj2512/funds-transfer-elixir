@@ -43,6 +43,11 @@ defmodule FundsTransfer.Account do
   end
 
   @impl true
+  def handle_call({:credit, amount}, _from, balance) when amount >= 1000 do
+    {:reply, {:error, "Limit Exceeded"}, balance}
+  end
+
+  @impl true
   def handle_call({:credit, amount}, _from, balance) do
     {:reply, balance + amount, balance + amount}
   end
